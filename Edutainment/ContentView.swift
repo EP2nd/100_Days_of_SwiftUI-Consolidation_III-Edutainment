@@ -64,6 +64,7 @@ struct ContentView: View {
     }
     
     func answerCheck() {
+        
         if answer == String(outcome) {
             score += 1
             numberOfQuestionsAsked -= 1
@@ -72,16 +73,14 @@ struct ContentView: View {
             numberOfQuestionsAsked -= 1
         }
         
-        if numberOfQuestionsAsked > 0 {
-            DispatchQueue.main.asyncAfter(deadline: .now()) {
+        DispatchQueue.main.async {
+            if self.numberOfQuestionsAsked > 0 {
                 self.multiplier = Int.random(in: 2...10)
                 self.startGame.toggle()
                 self.answer = ""
-            }
-        } else {
-            isGameOver.toggle()
-            
-            DispatchQueue.main.asyncAfter(deadline: .now()) {
+            } else {
+                self.isGameOver.toggle()
+                
                 self.score = 0
                 self.answer = ""
             }

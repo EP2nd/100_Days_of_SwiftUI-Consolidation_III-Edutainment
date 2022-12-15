@@ -4,7 +4,6 @@
 //
 //  Created by Edwin Przeźwiecki Jr. on 12/12/2022.
 //
-
 import SwiftUI
 
 struct ContentView: View {
@@ -12,16 +11,17 @@ struct ContentView: View {
     @State private var numberToMultiply = 2
     @State private var multiplier = Int.random(in: 2...10)
     @State private var numberOfQuestionsToAsk = 3
-    @State private var score = 0
     @State private var numberOfQuestionsAsked = 0
+    @State private var score = 0
     
     @State private var startGame = false
+    @State private var nextQuestion = false
     @State private var isGameOver = false
     
     @State private var answer = ""
     
     var outcome: Int {
-        return numberToMultiply * multiplier
+        numberToMultiply * multiplier
     }
     
     var body: some View {
@@ -43,6 +43,7 @@ struct ContentView: View {
                     numberOfQuestionsAsked = numberOfQuestionsToAsk
                     startGame.toggle()
                 }
+                
             }
             .navigationTitle("Edutainment")
             .toolbar {
@@ -57,7 +58,16 @@ struct ContentView: View {
             Text("\(numberToMultiply) x \(multiplier)?")
         }
         
+        .alert("Question", isPresented: $nextQuestion) {
+            TextField("Enter the value", text: $answer)
+                .keyboardType(.decimalPad)
+            Button("Answer", action: answerCheck)
+        } message: {
+            Text("\(numberToMultiply) x \(multiplier)?")
+        }
+        
         .alert("Game over!", isPresented: $isGameOver) {
+            Button("OK", action: resetGame)
         } message: {
             Text("You scored \(score) out of \(numberOfQuestionsToAsk)!")
         }
@@ -73,18 +83,24 @@ struct ContentView: View {
             numberOfQuestionsAsked -= 1
         }
         
-        DispatchQueue.main.async {
-            if self.numberOfQuestionsAsked > 0 {
-                self.multiplier = Int.random(in: 2...10)
-                self.startGame.toggle()
-                self.answer = ""
-            } else {
-                self.isGameOver.toggle()
-                
-                self.score = 0
-                self.answer = ""
+        if numberOfQuestionsAsked > 0 {
+            multiplier = Int.random(in: 2...10)
+            answer = ""
+            
+            if startGame {
+                nextQuestion.toggle()
+            } else if !startGame {
+                startGame.toggle()
             }
+        } else {
+            isGameOver.toggle()
         }
+        
+    }
+    
+    func resetGame() {
+        score = 0
+        answer = ""
     }
 }
 
